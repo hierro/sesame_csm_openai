@@ -1,3 +1,5 @@
+version: "3.8"
+
 services:
   csm-api:
     build:
@@ -12,8 +14,11 @@ services:
       - ./cloned_voices:/app/cloned_voices
       - ./voice_references:/app/voice_references  
       - ./voice_profiles:/app/voice_profiles    
+    env_file:
+      - .env
     environment:
-      - HF_TOKEN=${HF_TOKEN}  
+      - HF_TOKEN=${HF_TOKEN}
+    command: sleep infinity
     deploy:
       resources:
         reservations:

@@ -1,0 +1,13 @@
+{
+    "name": "sesame-dev",
+    "dockerComposeFile": ["../docker-compose.yml"],
+    "service": "csm-api",
+    "workspaceFolder": "/app",
+    "features": {},
+    "customizations": {
+      "vscode": {
+        "extensions": ["ms-python.python"]
+      }
+    }
+  }
+  
