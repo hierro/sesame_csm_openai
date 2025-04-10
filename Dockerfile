@@ -1,23 +1,6 @@
-# Multi-stage build for authenticated model downloads
-FROM python:3.10-slim AS model-downloader
-# Install huggingface-cli
-RUN pip install huggingface_hub
-# Set working directory
-WORKDIR /model-downloader
-# Create directory for downloaded models
-RUN mkdir -p /model-downloader/models
-# This will run when building the image
-# You'll need to pass your Hugging Face token at build time
-ARG HF_TOKEN
-ENV HF_TOKEN=${HF_TOKEN}
-# Login and download model
-RUN if [ -n "$HF_TOKEN" ]; then \
-    huggingface-cli login --token ${HF_TOKEN}; \
-    huggingface-cli download sesame/csm-1b ckpt.pt --local-dir /model-downloader/models; \
-    else echo "No HF_TOKEN provided, model download will be skipped"; fi
-
-# Now for the main application stage
+# Base image with CUDA support
 FROM nvidia/cuda:12.4.0-base-ubuntu22.04
+
 # Set environment variables
 ENV PYTHONFAULTHANDLER=1 \
     PYTHONUNBUFFERED=1 \
@@ -66,7 +49,6 @@ RUN pip3 install git+https://github.com/pytorch/ao.git
 # Install torchtune from source with specific branch for latest features
 RUN git clone https://github.com/pytorch/torchtune.git /tmp/torchtune && \
     cd /tmp/torchtune && \
-    # Try to use the main branch, which should have llama3_2
     git checkout main && \
     pip install -e .
 
@@ -79,10 +61,7 @@ RUN pip3 install yt-dlp openai-whisper
 # Copy application code
 COPY ./app /app/app
 
-# Copy downloaded model from the model-downloader stage
-COPY --from=model-downloader /model-downloader/models /app/models
-
-# Show available models in torchtune
+# Show available models in torchtune (for debug/log)
 RUN python3 -c "import torchtune.models; print('Available models in torchtune:', dir(torchtune.models))"
 
 # Expose port
