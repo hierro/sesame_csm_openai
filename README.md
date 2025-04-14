@@ -150,7 +150,7 @@ Once complete, you can open:
 
 ## Usage and API Reference
 
-See `USAGE.md` for full details on:
+See the [Usage Guide](./USAGE.md) for full details on:
 - TTS generation (`/v1/audio/speech`)
 - Voice cloning (via API or UI)
 - YouTube-based voice cloning
